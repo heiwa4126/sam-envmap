@@ -1,13 +1,16 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  sam-hello-py
+  sam-envmap
 
   Sample SAM Template for sam-hello-py
 
 Globals:
   Function:
     Timeout: 3
+    Runtime: python3.8
+    Architectures:
+      - x86_64
   Api:
     OpenApiVersion: 3.0.3
 
@@ -17,9 +20,21 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.lambda_handler
-      Runtime: python3.8
-      Architectures:
-        - x86_64
+      Environment:
+        Variables:
+          config: !Sub >-
+            {
+              "a":[1,2,3],
+              "region":"${AWS::Region}"
+            }
+          # escapeとかはしてくれない。間違いやすい
+          # こういう風に書けるようにしてほしい...
+          # config:
+          #   a:
+          #     - 1
+          #     - 2
+          #     - 3
+          #   region: !Ref AWS::Region
       Events:
         HelloWorld:
           Type: Api
